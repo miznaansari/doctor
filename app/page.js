@@ -1,65 +1,189 @@
-import Image from "next/image";
+// app/page.jsx  or  pages/index.jsx
+"use client";
+
+import { useEffect, useState } from "react";
+
+import PatientSidebar from "@/components/PatientSidebar";
+import AddPatientForm from "@/components/AddPatientForm";
+import PatientHeader from "@/components/PatientHeader";
+import RecordCard from "@/components/RecordCard";
+import AddRecordForm from "@/components/AddRecordForm";
 
 export default function Home() {
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [records, setRecords] = useState([]);
+  const [patientForm, setPatientForm] = useState({});
+  const [recordForm, setRecordForm] = useState({});
+  const [sidebarOpen, setSidebarOpen] = useState(false); // for mobile
+
+  const fetchPatients = async () => {
+    try {
+      const res = await fetch("/api/patient");
+      if (!res.ok) throw new Error("Failed to fetch patients");
+      setPatients(await res.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const selectPatient = async (patient) => {
+    setSelectedPatient(patient);
+    setSidebarOpen(false); // close sidebar on mobile after selection
+
+    try {
+      const res = await fetch(`/api/record/${patient.id}`);
+      if (!res.ok) throw new Error("Failed to fetch records");
+      setRecords(await res.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const addPatient = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/patient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patientForm),
+      });
+      if (!res.ok) throw new Error("Failed to add patient");
+      setPatientForm({});
+      fetchPatients();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const addRecord = async (e) => {
+    e.preventDefault();
+    if (!selectedPatient) return;
+
+    try {
+      const res = await fetch("/api/record", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...recordForm,
+          patientId: selectedPatient.id,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to add record");
+      setRecordForm({});
+      selectPatient(selectedPatient); // refresh records
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div className="flex flex-col h-screen bg-gray-50 md:flex-row">
+      {/* Mobile header with menu button */}
+      <div className="md:hidden bg-white border-b shadow-sm">
+        <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="text-lg font-semibold text-gray-800">
+            Patient Records
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Sidebar – hidden on mobile unless opened */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-50 w-80 bg-white border-r shadow-lg transform transition-transform duration-300 ease-in-out
+          md:relative md:translate-x-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b md:hidden">
+            <h2 className="text-lg font-bold text-gray-800">Patients</h2>
+          </div>
+
+          <PatientSidebar
+            patients={patients}
+            selectedPatient={selectedPatient}
+            selectPatient={selectPatient}
+          />
+{/* 
+          <div className="p-4 border-t mt-auto">
+            <AddPatientForm
+              patientForm={patientForm}
+              setPatientForm={setPatientForm}
+              onSubmit={addPatient}
+              refreshPatients={fetchPatients}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div> */}
         </div>
-      </main>
+      </div>
+
+      {/* Overlay for mobile when sidebar is open */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {!selectedPatient ? (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p className="text-lg">Select a patient from the sidebar</p>
+            </div>
+          ) : (
+            <div className="space-y-6 pb-12">
+              <PatientHeader patient={selectedPatient} />
+
+              <div className="space-y-4">
+                {records.length === 0 ? (
+                  <div className="text-center py-10 text-gray-500">
+                    No records yet for this patient
+                  </div>
+                ) : (
+                  records.map((record) => (
+                    <RecordCard key={record.id} record={record} />
+                  ))
+                )}
+              </div>
+
+              <div className="mt-8">
+                <AddRecordForm
+                  selectedPatient={selectedPatient}
+                  recordForm={recordForm}
+                  setRecordForm={setRecordForm}
+                  onSubmit={addRecord}
+                  refreshRecords={() => selectPatient(selectedPatient)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
