@@ -25,24 +25,28 @@ export default function PatientSidebar({
   };
 
   return (
-    <Card className="w-full sticky top-0 h-[100dvh] flex flex-col border-0 md:border-r md:rounded-r-2xl shadow-sm overflow-hidden">
+    <Card className="w-full sticky top-0 h-[100dvh] flex flex-col border-0 md:border-r shadow-lg bg-background/95 backdrop-blur-xl overflow-hidden pt-0 rounded-none ">
 
       {/* HEADER */}
-      <CardHeader className="shrink-0 flex flex-row items-center justify-between gap-2 bg-primary text-primary-foreground px-4 py-4">
+      <CardHeader className="shrink-0  flex flex-row items-center justify-between gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-6 py-5 shadow-md rounded-none ">
         <div>
-          <CardTitle className="text-lg font-semibold">
+          <CardTitle className="text-xl font-bold tracking-tight drop-shadow-sm">
             Patients
           </CardTitle>
-          <p className="text-xs text-primary-foreground/80">
+          <p className="text-xs text-primary-foreground/90 mt-1 font-medium">
             Manage records
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-
-          <Link href="/add">
-            <Button size="icon" variant="secondary" className="rounded-full">
+          <Link href="/add" passHref legacyBehavior>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="rounded-full shadow hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring/70 transition"
+              aria-label="Add patient"
+            >
               <Plus />
             </Button>
           </Link>
@@ -51,71 +55,69 @@ export default function PatientSidebar({
 
       {/* LIST (SCROLL AREA) */}
       <CardContent
-        className="flex-1 overflow-y-auto px-2 py-3 space-y-2
-        scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+        className="flex-1 overflow-y-auto px-2 py-3 space-y-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent bg-background/80"
       >
         {patients?.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-10">
+          <div className="text-center text-muted-foreground text-sm py-10 italic opacity-70">
             No patients added yet
           </div>
         )}
 
         {patients?.map((p) => {
           const isActive = selectedPatient?.id === p.id;
-
           return (
-            <div
+            <button
               key={p.id}
+              type="button"
               onClick={() => selectPatient(p)}
-              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border group ${
+              className={`group flex items-center gap-3 w-full p-3 rounded-xl cursor-pointer border transition-all duration-150 focus-visible:ring-2 focus-visible:ring-ring/70 outline-none ${
                 isActive
-                  ? "bg-primary/10 border-primary shadow-sm"
-                  : "bg-card border-transparent hover:bg-muted"
+                  ? "bg-primary/10 border-primary shadow-md"
+                  : "bg-card border-transparent hover:bg-muted/70 hover:shadow-sm"
               }`}
+              tabIndex={0}
             >
               {/* Avatar */}
               <div
-                className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold transition ${
+                className={`w-10 h-10 flex items-center justify-center rounded-full text-base font-bold transition-all border-2 ${
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground group-hover:bg-primary/10"
+                    ? "bg-primary text-primary-foreground border-primary/80 scale-105 shadow"
+                    : "bg-muted text-muted-foreground border-transparent group-hover:border-primary/40 group-hover:scale-105"
                 }`}
+                aria-label={p.patientName}
               >
                 {p.patientName?.charAt(0)?.toUpperCase()}
               </div>
-
               {/* Info */}
               <div className="flex flex-col overflow-hidden">
                 <span
-                  className={`font-medium truncate ${
-                    isActive ? "text-primary" : "text-foreground"
+                  className={`font-semibold truncate ${
+                    isActive ? "text-primary" : "text-foreground group-hover:text-primary"
                   }`}
                 >
                   {p.patientName}
                 </span>
-
                 {p.age && (
                   <span className="text-xs text-muted-foreground">
                     {p.age} yrs
                   </span>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </CardContent>
 
       {/* FOOTER */}
-      <div className="shrink-0 p-3 border-t flex items-center justify-between bg-muted/40 backdrop-blur">
-        <span className="text-xs text-muted-foreground">
+      <div className="shrink-0 p-4 border-t flex items-center justify-between bg-muted/60 backdrop-blur-lg">
+        <span className="text-xs text-muted-foreground font-medium tracking-wide">
           Logged in
         </span>
-
         <Button
           variant="destructive"
           size="sm"
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-full"
+          className="flex items-center gap-2 rounded-full shadow-sm hover:scale-105 focus-visible:ring-2 focus-visible:ring-destructive/60 transition"
         >
           <LogOut className="w-4 h-4" />
           Logout
