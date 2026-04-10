@@ -3,7 +3,9 @@ import { withRequireUser } from "@/lib/withRequireUser";
 
 
 export const GET = withRequireUser(async function GET(req) {
+  const user = req.user;
   const patients = await prisma.patient.findMany({
+    where: { userId: user.id },
     orderBy: { createdAt: "desc" },
   });
   return Response.json(patients);
@@ -11,6 +13,7 @@ export const GET = withRequireUser(async function GET(req) {
 
 export const POST = withRequireUser(async function POST(req) {
   try {
+    const user = req.user;
     const body = await req.json();
     const errors = {};
     if (!body.patientName) errors.patientName = "Name is required";
@@ -26,6 +29,7 @@ export const POST = withRequireUser(async function POST(req) {
         age: Number(body.age),
         fatherName: body.fatherName,
         address: body.address,
+        userId: user.id,
       },
     });
     return Response.json(patient);

@@ -82,23 +82,17 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 md:flex-row">
+    <div className="flex flex-col min-h-screen md:flex-row bg-background">
       {/* Mobile header with menu button */}
-      <div className="md:hidden bg-white border-b shadow-sm">
+      <div className="md:hidden bg-background border-b">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-semibold text-gray-800">
-            Patient Records
-          </h1>
+          <h1 className="text-lg font-semibold text-foreground">Patient Records</h1>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+            className="p-2 text-muted-foreground hover:text-primary focus:outline-none"
+            aria-label="Toggle sidebar"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -111,57 +105,42 @@ export default function Home() {
       </div>
 
       {/* Sidebar – hidden on mobile unless opened */}
-      <div
+      <aside
         className={`
-          fixed inset-y-0 left-0 z-50 w-80 bg-white border-r shadow-lg transform transition-transform duration-300 ease-in-out
-          md:relative md:translate-x-0
+          fixed inset-y-0 left-0 z-50 w-72 max-w-full bg-background border-r shadow-lg transform transition-transform duration-300 ease-in-out
+          md:relative md:translate-x-0 md:w-80
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
+        aria-label="Sidebar"
       >
-        <div className="flex flex-col h-full">
-          <div className="p-4 border-b md:hidden">
-            <h2 className="text-lg font-bold text-gray-800">Patients</h2>
-          </div>
-
-          <PatientSidebar
-            patients={patients}
-            selectedPatient={selectedPatient}
-            selectPatient={selectPatient}
-          />
-{/* 
-          <div className="p-4 border-t mt-auto">
-            <AddPatientForm
-              patientForm={patientForm}
-              setPatientForm={setPatientForm}
-              onSubmit={addPatient}
-              refreshPatients={fetchPatients}
-            />
-          </div> */}
-        </div>
-      </div>
+        <PatientSidebar
+          patients={patients}
+          selectedPatient={selectedPatient}
+          selectPatient={selectPatient}
+        />
+      </aside>
 
       {/* Overlay for mobile when sidebar is open */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {!selectedPatient ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
+            <div className="flex items-center justify-center h-full text-muted-foreground">
               <p className="text-lg">Select a patient from the sidebar</p>
             </div>
           ) : (
             <div className="space-y-6 pb-12">
               <PatientHeader patient={selectedPatient} />
-
               <div className="space-y-4">
                 {records.length === 0 ? (
-                  <div className="text-center py-10 text-gray-500">
+                  <div className="text-center py-10 text-muted-foreground">
                     No records yet for this patient
                   </div>
                 ) : (
@@ -170,7 +149,6 @@ export default function Home() {
                   ))
                 )}
               </div>
-
               <div className="mt-8">
                 <AddRecordForm
                   selectedPatient={selectedPatient}
@@ -183,7 +161,7 @@ export default function Home() {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

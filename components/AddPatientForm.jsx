@@ -1,33 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
-/* Move Input outside */
-function Input({ label, name, type = "text", form, errors, update }) {
-  return (
-    <div>
-      <label className="text-sm font-medium text-gray-600">
-        {label}
-      </label>
-
-      <input
-        type={type}
-        value={form[name]}
-        className={`input mt-1 ${
-          errors[name] ? "border-red-500" : ""
-        }`}
-        onChange={(e) => update(name, e.target.value)}
-      />
-
-      {errors[name] && (
-        <p className="text-red-500 text-sm">{errors[name]}</p>
-      )}
-    </div>
-  );
-}
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function AddPatientForm({ refreshPatients }) {
+  const router = useRouter();
+
   const initialForm = {
     patientName: "",
     age: "",
@@ -41,40 +25,47 @@ export default function AddPatientForm({ refreshPatients }) {
 
   const update = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-
     if (errors[key]) {
       setErrors((prev) => ({ ...prev, [key]: null }));
     }
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (!form.patientName.trim()) newErrors.patientName = "Required";
+    if (!form.age || form.age < 0) newErrors.age = "Invalid age";
+    if (!form.fatherName.trim()) newErrors.fatherName = "Required";
+    if (!form.address.trim()) newErrors.address = "Required";
+    return newErrors;
+  };
+
   const submit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
+      return;
+    }
 
     setLoading(true);
     setErrors({});
-
     const toastId = toast.loading("Creating patient...");
 
     try {
       const res = await fetch("/api/patient", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, age: Number(form.age) }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         toast.dismiss(toastId);
-
-        if (data.errors) {
-          setErrors(data.errors);
-        } else {
-          toast.error(data.error);
-        }
-
+        if (data?.errors) setErrors(data.errors);
+        else toast.error(data?.error || "Something went wrong");
         setLoading(false);
         return;
       }
@@ -83,7 +74,9 @@ export default function AddPatientForm({ refreshPatients }) {
       toast.success("Patient created");
 
       setForm(initialForm);
-      refreshPatients();
+      refreshPatients?.();
+      router.push("/");
+
     } catch {
       toast.dismiss(toastId);
       toast.error("Network error");
@@ -93,55 +86,96 @@ export default function AddPatientForm({ refreshPatients }) {
   };
 
   return (
-    <form
-      onSubmit={submit}
-      className="p-4 border-t space-y-3 bg-gray-50"
-    >
-      <div className="font-semibold text-gray-700">
-        Add New Patient
-      </div>
+    <div className="relative">
 
-      <Input
-        label="Patient Name"
-        name="patientName"
-        form={form}
-        errors={errors}
-        update={update}
-      />
+      {/* 🔥 LOADER */}
+      {loading && (
+        <div className="absolute inset-0 z-50 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-xl">
+          <Loader2 className="w-5 h-5 animate-spin" />
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          label="Age"
-          name="age"
-          type="number"
-          form={form}
-          errors={errors}
-          update={update}
-        />
+      <form onSubmit={submit} className="space-y-5">
 
-        <Input
-          label="Father Name"
-          name="fatherName"
-          form={form}
-          errors={errors}
-          update={update}
-        />
-      </div>
+        <h2 className="text-lg font-semibold">
+          Patient Information
+        </h2>
 
-      <Input
-        label="Address"
-        name="address"
-        form={form}
-        errors={errors}
-        update={update}
-      />
+        {/* NAME */}
+        <div className="space-y-2">
+          <Label>Patient Name</Label>
+          <Input
+            value={form.patientName}
+            onChange={(e) => update("patientName", e.target.value)}
+            placeholder="Enter patient name"
+            disabled={loading}
+          />
+          {errors.patientName && (
+            <p className="text-destructive text-xs">
+              {errors.patientName}
+            </p>
+          )}
+        </div>
 
-      <button
-        disabled={loading}
-        className="bg-green-600 text-white w-full p-2 rounded-lg disabled:opacity-50"
-      >
-        {loading ? "Saving..." : "Add Patient"}
-      </button>
-    </form>
+        {/* AGE + FATHER */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Age</Label>
+            <Input
+              type="number"
+              value={form.age}
+              onChange={(e) => update("age", e.target.value)}
+              placeholder="Age"
+              disabled={loading}
+            />
+            {errors.age && (
+              <p className="text-destructive text-xs">{errors.age}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Father Name</Label>
+            <Input
+              value={form.fatherName}
+              onChange={(e) => update("fatherName", e.target.value)}
+              placeholder="Father name"
+              disabled={loading}
+            />
+            {errors.fatherName && (
+              <p className="text-destructive text-xs">
+                {errors.fatherName}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* ADDRESS */}
+        <div className="space-y-2">
+          <Label>Address</Label>
+          <Input
+            value={form.address}
+            onChange={(e) => update("address", e.target.value)}
+            placeholder="Address"
+            disabled={loading}
+          />
+          {errors.address && (
+            <p className="text-destructive text-xs">
+              {errors.address}
+            </p>
+          )}
+        </div>
+
+        {/* BUTTON */}
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+          {loading ? "Saving..." : "Add Patient"}
+        </Button>
+
+      </form>
+    </div>
   );
 }

@@ -1,7 +1,12 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function SignupPage() {
   const [form, setForm] = useState({ email: "", password: "", name: "" });
@@ -31,42 +36,58 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow w-full max-w-sm space-y-4">
-        <h2 className="text-2xl font-bold mb-2">Sign Up</h2>
-        <input
-          name="name"
-          type="text"
-          placeholder="Name (optional)"
-          className="input"
-          value={form.name}
-          onChange={handleChange}
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="input"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          className="input"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <button disabled={loading} className="bg-green-600 text-white w-full p-2 rounded-lg disabled:opacity-50">
-          {loading ? "Signing up..." : "Sign Up"}
-        </button>
-        <div className="text-sm text-center">
-          Already have an account? <a href="/login" className="text-green-700 underline">Login</a>
-        </div>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-background px-2">
+      <Card className="w-full max-w-sm p-6 shadow-lg">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <CardHeader className="p-0 mb-2">
+            <CardTitle className="text-2xl">Sign Up</CardTitle>
+          </CardHeader>
+          <div className="space-y-2">
+            <Label htmlFor="name">Name (optional)</Label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Name (optional)"
+              value={form.name}
+              onChange={handleChange}
+              autoComplete="name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              autoComplete="email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              autoComplete="new-password"
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing up..." : "Sign Up"}
+          </Button>
+          <div className="text-sm text-center mt-2">
+            Already have an account? <a href="/login" className="text-primary underline">Login</a>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 }

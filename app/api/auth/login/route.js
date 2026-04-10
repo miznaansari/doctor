@@ -23,12 +23,14 @@ export async function POST(req) {
     await prisma.userSession.create({
       data: { userId: user.id, authToken, expiresAt },
     });
-    cookies().set("authToken", authToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      expires: expiresAt,
-    });
+    const cookieStore = await cookies();
+
+cookieStore.set("authToken", authToken, {
+  httpOnly: true,
+  sameSite: "lax",
+  path: "/",
+  expires: expiresAt,
+});
     return Response.json({ id: user.id, email: user.email, name: user.name });
   } catch (e) {
     return Response.json({ error: "Login failed" }, { status: 500 });

@@ -1,38 +1,61 @@
-import clsx from "clsx";
-import { Plus } from "lucide-react";
+"use client";
+
+import { Plus, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/app/ThemeToggle";
 
 export default function PatientSidebar({
   patients,
   selectedPatient,
   selectPatient,
 }) {
-  return (
-    <div className="w-80 bg-gray-50 border-r flex flex-col h-full">
+  const router = useRouter();
 
-      {/* Header */}
-      <div className="px-6 py-5 bg-green-600 text-white flex items-center justify-between">
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  };
+
+  return (
+    <Card className="w-full sticky top-0 h-[100dvh] flex flex-col border-0 md:border-r md:rounded-r-2xl shadow-sm overflow-hidden">
+
+      {/* HEADER */}
+      <CardHeader className="shrink-0 flex flex-row items-center justify-between gap-2 bg-primary text-primary-foreground px-4 py-4">
         <div>
-          <h2 className="text-xl font-semibold tracking-wide">
+          <CardTitle className="text-lg font-semibold">
             Patients
-          </h2>
-          <p className="text-sm text-green-100 mt-1">
-            Manage patient records
+          </CardTitle>
+          <p className="text-xs text-primary-foreground/80">
+            Manage records
           </p>
         </div>
 
-        {/* Add Patient Icon */}
-        <Link href="/add">
-          <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-green-600 text-xl font-bold cursor-pointer hover:bg-green-100 transition">
-            <Plus />
-          </button>
-        </Link>
-      </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
 
-      {/* Patient List */}
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
+          <Link href="/add">
+            <Button size="icon" variant="secondary" className="rounded-full">
+              <Plus />
+            </Button>
+          </Link>
+        </div>
+      </CardHeader>
+
+      {/* LIST (SCROLL AREA) */}
+      <CardContent
+        className="flex-1 overflow-y-auto px-2 py-3 space-y-2
+        scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+      >
         {patients?.length === 0 && (
-          <div className="text-center text-gray-400 text-sm py-10">
+          <div className="text-center text-muted-foreground text-sm py-10">
             No patients added yet
           </div>
         )}
@@ -44,36 +67,35 @@ export default function PatientSidebar({
             <div
               key={p.id}
               onClick={() => selectPatient(p)}
-              className={clsx(
-                "flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border",
+              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border group ${
                 isActive
-                  ? "bg-green-50 border-green-300 shadow-sm"
-                  : "bg-white border-transparent hover:bg-gray-100"
-              )}
+                  ? "bg-primary/10 border-primary shadow-sm"
+                  : "bg-card border-transparent hover:bg-muted"
+              }`}
             >
+              {/* Avatar */}
               <div
-                className={clsx(
-                  "w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold",
+                className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold transition ${
                   isActive
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-200 text-gray-700"
-                )}
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground group-hover:bg-primary/10"
+                }`}
               >
                 {p.patientName?.charAt(0)?.toUpperCase()}
               </div>
 
-              <div className="flex flex-col">
+              {/* Info */}
+              <div className="flex flex-col overflow-hidden">
                 <span
-                  className={clsx(
-                    "font-medium",
-                    isActive ? "text-green-700" : "text-gray-800"
-                  )}
+                  className={`font-medium truncate ${
+                    isActive ? "text-primary" : "text-foreground"
+                  }`}
                 >
                   {p.patientName}
                 </span>
 
                 {p.age && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {p.age} yrs
                   </span>
                 )}
@@ -81,9 +103,24 @@ export default function PatientSidebar({
             </div>
           );
         })}
+      </CardContent>
+
+      {/* FOOTER */}
+      <div className="shrink-0 p-3 border-t flex items-center justify-between bg-muted/40 backdrop-blur">
+        <span className="text-xs text-muted-foreground">
+          Logged in
+        </span>
+
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleLogout}
+          className="flex items-center gap-2 rounded-full"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }
-
-
