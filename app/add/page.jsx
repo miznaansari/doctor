@@ -28,7 +28,7 @@ export default function AddPatientPage() {
           </button>
 
           <h1 className="text-base sm:text-lg font-semibold">
-            Add Patient
+            Add Patient <span className="ml-2 text-xs text-muted-foreground font-normal">(Mobile number required)</span>
           </h1>
         </div>
       </div>

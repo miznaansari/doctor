@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, LogOut } from "lucide-react";
+import { useState } from "react";
+import { Plus, LogOut, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -18,17 +19,23 @@ export default function PatientSidebar({
   selectPatient,
 }) {
   const router = useRouter();
+  const [search, setSearch] = useState("");
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
-  return (
-    <Card className="w-full sticky top-0 h-[100dvh] flex flex-col border-0 md:border-r shadow-lg bg-background/95 backdrop-blur-xl overflow-hidden pt-0 rounded-none ">
+  // 🔍 Filter patients
+  const filteredPatients = patients?.filter((p) =>
+    p.patientName?.toLowerCase().includes(search.toLowerCase())
+  );
 
+  return (
+    <Card className="w-full sticky top-0 h-[100dvh] flex flex-col border-0 md:border-r shadow-lg bg-background/95 backdrop-blur-xl overflow-hidden pt-0 rounded-none">
+      
       {/* HEADER */}
-      <CardHeader className="shrink-0  flex flex-row items-center justify-between gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-6 py-5 shadow-md rounded-none ">
+      <CardHeader className="shrink-0 flex flex-row items-center justify-between gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-6 py-5 shadow-md rounded-none">
         <div>
           <CardTitle className="text-xl font-bold tracking-tight drop-shadow-sm">
             Patients
@@ -53,18 +60,34 @@ export default function PatientSidebar({
         </div>
       </CardHeader>
 
-      {/* LIST (SCROLL AREA) */}
-      <CardContent
-        className="flex-1 overflow-y-auto px-2 py-3 space-y-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent bg-background/80"
-      >
-        {patients?.length === 0 && (
+      {/* 🔍 SEARCH BAR */}
+      <div className="px-3 py-2 border-b bg-background/80 backdrop-blur-md">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search patients..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 rounded-lg text-sm bg-muted/60 border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition placeholder:text-muted-foreground"
+          />
+        </div>
+      </div>
+
+      {/* LIST */}
+      <CardContent className="flex-1 overflow-y-auto px-2 py-3 space-y-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent bg-background/80">
+        
+        {/* EMPTY STATE */}
+        {filteredPatients?.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-10 italic opacity-70">
-            No patients added yet
+            {search ? "No matching patients found" : "No patients added yet"}
           </div>
         )}
 
-        {patients?.map((p) => {
+        {/* PATIENT LIST */}
+        {filteredPatients?.map((p) => {
           const isActive = selectedPatient?.id === p.id;
+
           return (
             <button
               key={p.id}
@@ -75,7 +98,6 @@ export default function PatientSidebar({
                   ? "bg-primary/10 border-primary shadow-md"
                   : "bg-card border-transparent hover:bg-muted/70 hover:shadow-sm"
               }`}
-              tabIndex={0}
             >
               {/* Avatar */}
               <div
@@ -84,19 +106,22 @@ export default function PatientSidebar({
                     ? "bg-primary text-primary-foreground border-primary/80 scale-105 shadow"
                     : "bg-muted text-muted-foreground border-transparent group-hover:border-primary/40 group-hover:scale-105"
                 }`}
-                aria-label={p.patientName}
               >
                 {p.patientName?.charAt(0)?.toUpperCase()}
               </div>
+
               {/* Info */}
-              <div className="flex flex-col overflow-hidden">
+              <div className="flex flex-col overflow-hidden text-left">
                 <span
                   className={`font-semibold truncate ${
-                    isActive ? "text-primary" : "text-foreground group-hover:text-primary"
+                    isActive
+                      ? "text-primary"
+                      : "text-foreground group-hover:text-primary"
                   }`}
                 >
                   {p.patientName}
                 </span>
+
                 {p.age && (
                   <span className="text-xs text-muted-foreground">
                     {p.age} yrs
@@ -113,6 +138,7 @@ export default function PatientSidebar({
         <span className="text-xs text-muted-foreground font-medium tracking-wide">
           Logged in
         </span>
+
         <Button
           variant="destructive"
           size="sm"

@@ -16,6 +16,7 @@ export default function AddPatientForm({ refreshPatients }) {
     patientName: "",
     age: "",
     fatherName: "",
+    mobileNumber: "",
     address: "",
   };
 
@@ -35,6 +36,8 @@ export default function AddPatientForm({ refreshPatients }) {
     if (!form.patientName.trim()) newErrors.patientName = "Required";
     if (!form.age || form.age < 0) newErrors.age = "Invalid age";
     if (!form.fatherName.trim()) newErrors.fatherName = "Required";
+    if (!form.mobileNumber.trim()) newErrors.mobileNumber = "Required";
+    else if (!/^\d{10,15}$/.test(form.mobileNumber.trim())) newErrors.mobileNumber = "Invalid mobile number";
     if (!form.address.trim()) newErrors.address = "Required";
     return newErrors;
   };
@@ -117,8 +120,8 @@ export default function AddPatientForm({ refreshPatients }) {
           )}
         </div>
 
-        {/* AGE + FATHER */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* AGE + FATHER + MOBILE */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>Age</Label>
             <Input
@@ -145,6 +148,22 @@ export default function AddPatientForm({ refreshPatients }) {
               <p className="text-destructive text-xs">
                 {errors.fatherName}
               </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Mobile Number</Label>
+            <Input
+              value={form.mobileNumber}
+              onChange={(e) => update("mobileNumber", e.target.value)}
+              placeholder="Mobile number"
+              disabled={loading}
+              type="tel"
+              pattern="\d{10,15}"
+              maxLength={15}
+            />
+            {errors.mobileNumber && (
+              <p className="text-destructive text-xs">{errors.mobileNumber}</p>
             )}
           </div>
         </div>

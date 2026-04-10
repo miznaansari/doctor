@@ -3,6 +3,7 @@
 import { MapPin, User, Calendar } from "lucide-react";
 
 export default function PatientHeader({ patient }) {
+  console.log('patient',patient)
   return (
     <div className="w-full bg-card border rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-all">
       
@@ -29,7 +30,7 @@ export default function PatientHeader({ patient }) {
 
           <span className="flex items-center gap-1">
             <User className="w-4 h-4" />
-            {patient.fatherName}
+            {patient.fatherName} - {patient?.mobileNumber || "No mobile"}
           </span>
 
           <span className="flex items-center gap-1 truncate max-w-[200px]">

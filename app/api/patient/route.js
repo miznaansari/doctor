@@ -19,6 +19,7 @@ export const POST = withRequireUser(async function POST(req) {
     if (!body.patientName) errors.patientName = "Name is required";
     if (!body.age) errors.age = "Age is required";
     if (!body.fatherName) errors.fatherName = "Father name is required";
+    if (!body.mobileNumber) errors.mobileNumber = "Mobile number is required";
     if (!body.address) errors.address = "Address is required";
     if (Object.keys(errors).length > 0) {
       return Response.json({ errors }, { status: 400 });
@@ -28,6 +29,7 @@ export const POST = withRequireUser(async function POST(req) {
         patientName: body.patientName,
         age: Number(body.age),
         fatherName: body.fatherName,
+        mobileNumber: body.mobileNumber,
         address: body.address,
         userId: user.id,
       },
