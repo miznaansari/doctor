@@ -1,24 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { withRequireUser } from "@/lib/withRequireUser";
 
-export async function POST(req) {
+export const POST = withRequireUser(async function POST(req) {
   try {
     const body = await req.json();
-
-    console.log("Incoming record request:", body);
-
     const errors = {};
-
     if (!body.patientId) errors.patientId = "Patient missing";
     if (!body.date) errors.date = "Date is required";
     if (!body.complain) errors.complain = "Complain is required";
-
     if (Object.keys(errors).length > 0) {
       return Response.json(
         { errors },
         { status: 400 }
       );
     }
-
     const record = await prisma.patientRecord.create({
       data: {
         patientId: body.patientId,
@@ -31,16 +26,12 @@ export async function POST(req) {
         cure: body.cure || "",
       },
     });
-
-    console.log("Record created:", record);
-
     return Response.json(record);
   } catch (error) {
     console.error(error);
-
     return Response.json(
       { error: "Server error while creating record" },
       { status: 500 }
     );
   }
-}
+});
