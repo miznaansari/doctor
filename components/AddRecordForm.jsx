@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Loader2, Calendar } from "lucide-react";
 
 /* =========================
@@ -9,7 +9,7 @@ import { Loader2, Calendar } from "lucide-react";
 ========================= */
 function Input({ label, type = "text", icon, value, onChange, error, loading }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 font-sans">
       <label className="text-sm font-medium text-muted-foreground">
         {label}
       </label>
@@ -47,7 +47,7 @@ function Input({ label, type = "text", icon, value, onChange, error, loading }) 
 ========================= */
 function TextArea({ label, value, onChange, error, loading }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 font-sans">
       <label className="text-sm font-medium text-muted-foreground">
         {label}
       </label>
@@ -77,6 +77,7 @@ function TextArea({ label, value, onChange, error, loading }) {
 export default function AddRecordForm({
   selectedPatient,
   refreshRecords,
+  onSaveSuccess,
 }) {
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -131,22 +132,19 @@ export default function AddRecordForm({
       const data = await res.json();
 
       if (!res.ok) {
-        toast.dismiss(toastId);
-
         if (data.errors) {
           setErrors(data.errors);
-          toast.error("Please fix the form");
+          toast.error("Please fix the form", { id: toastId });
         } else {
-          toast.error(data.error || "Something went wrong");
+          toast.error(data.error || "Something went wrong", { id: toastId });
         }
 
         setLoading(false);
         return;
       }
 
-      // ✅ Success
-      toast.dismiss(toastId);
-      toast.success("Visit record saved");
+      // ✅ Update existing loading toast directly (No duplicate 2nd toast!)
+      toast.success("Visit record saved", { id: toastId });
 
       setForm({
         date: getCurrentDateTime(),
@@ -159,35 +157,24 @@ export default function AddRecordForm({
       });
 
       refreshRecords?.();
+      onSaveSuccess?.();
 
     } catch {
-      toast.dismiss(toastId);
-      toast.error("Network error");
+      toast.error("Network error", { id: toastId });
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="relative">
-
-      {/* 🔥 FULL SCREEN LOADER */}
-      {loading && (
-        <div className="absolute inset-0 z-50 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-xl">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Saving record...
-          </div>
-        </div>
-      )}
-
+    <div className="relative font-sans">
       <form
         onSubmit={submit}
-        className="bg-card border p-5 mt-4 rounded-2xl shadow-sm space-y-5"
+        className="bg-card border border-border p-5 mt-4 rounded-2xl shadow-xs space-y-5"
       >
         {/* HEADER */}
-        <div className="border-b pb-2">
-          <h2 className="font-semibold text-base">
+        <div className="border-b border-border pb-2">
+          <h2 className="font-bold text-base text-foreground">
             Add Visit Record
           </h2>
         </div>
@@ -262,7 +249,7 @@ export default function AddRecordForm({
         {/* BUTTON */}
         <button
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-lg font-medium transition hover:opacity-90 disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold transition shadow-xs disabled:opacity-50"
         >
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           {loading ? "Saving Record..." : "Save Record"}

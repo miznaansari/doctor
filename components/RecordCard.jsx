@@ -2,48 +2,39 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-import { CalendarDays, ChevronDown } from "lucide-react";
+import { CalendarDays, ChevronDown, Activity, Pill, Lightbulb, CheckCircle2, FileSearch } from "lucide-react";
 
 /* =========================
-   🔹 Date Formatter (PRO UX)
+   🔹 Date Formatter
 ========================= */
 function formatDate(dateStr) {
+  if (!dateStr) return "";
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
 
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yy = String(date.getFullYear()).slice(-2);
-
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12 || 12; // convert 0 → 12
-
-  const hh = String(hours).padStart(2, "0");
-
-  return `${dd}-${mm}-${yy} ${hh}:${minutes}:${seconds} ${ampm}`;
+  return new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
 }
 
 /* =========================
-   🔹 Field Component
+   🔹 Clinical Section Item
 ========================= */
-function Field({ label, value }) {
+function ClinicalItem({ icon: Icon, label, value, colorClass = "text-teal-600 dark:text-teal-400" }) {
   if (!value) return null;
 
   return (
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground font-medium">
-        {label}
-      </p>
-      <p className="text-sm sm:text-base text-foreground leading-relaxed break-words">
+    <div className="bg-muted/30 border border-border/50 rounded-lg p-2.5 space-y-0.5">
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+        <Icon className={`w-3.5 h-3.5 ${colorClass}`} />
+        <span>{label}</span>
+      </div>
+      <p className="text-xs sm:text-sm text-foreground leading-relaxed font-medium pl-5 whitespace-pre-line">
         {value}
       </p>
     </div>
@@ -51,74 +42,86 @@ function Field({ label, value }) {
 }
 
 /* =========================
-   🔹 Main Component
+   🔹 Main RecordCard Component
 ========================= */
-export default function RecordCard({ record }) {
-  const [open, setOpen] = useState(false);
+export default function RecordCard({ record, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  const isCured = record.cure?.toLowerCase().includes("cure") || record.cure?.toLowerCase().includes("yes");
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.15 }}
+      className="w-full"
     >
-      <Card className="mt-3 rounded-xl shadow-sm border hover:shadow-md transition-all">
-
-        {/* HEADER */}
-        <CardHeader
+      <div className="bg-card border border-border rounded-xl shadow-xs hover:border-teal-500/50 transition-all overflow-hidden font-sans">
+        
+        {/* 🔹 COMPACT HEADER */}
+        <div
           onClick={() => setOpen(!open)}
-          className="flex flex-row items-center justify-between cursor-pointer py-3"
+          className="p-3 sm:p-3.5 cursor-pointer select-none bg-muted/20 hover:bg-muted/40 transition space-y-1"
         >
-          {/* LEFT */}
-          <div className="flex flex-col min-w-0">
-            <CardTitle className="text-sm sm:text-base font-semibold">
-              Visit Record
-            </CardTitle>
+          {/* Top Row: Date, Status, and Toggle Button */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 flex-wrap min-w-0">
+              <span className="font-bold text-xs sm:text-sm text-foreground flex items-center gap-1.5">
+                <CalendarDays className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                {formatDate(record.date)}
+              </span>
 
-            {/* 🧠 Preview */}
-            <p className="text-xs text-muted-foreground truncate max-w-[180px] sm:max-w-[300px]">
-              {record.complain || "No complaint"}
-            </p>
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground shrink-0">
-            <CalendarDays className="w-4 h-4" />
-
-            {/* 📱 Mobile */}
-            <span className="">
-              {formatDate(record.date)}
-            </span>
-
-          
-
-            {/* ICON */}
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${
-                open ? "rotate-180" : ""
-              }`}
-            />
-          </div>
-        </CardHeader>
-
-        {/* CONTENT */}
-        {open && (
-          <CardContent className="pt-2 pb-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-              <Field label="Patient Complaint" value={record.complain} />
-              <Field label="Investigation" value={record.investigation} />
-
-              <Field label="Treatment Given" value={record.treatment} />
-              <Field label="Doctor Advice" value={record.advice} />
-
-              <Field label="Improvement" value={record.improvement} />
-              <Field label="Cure Status" value={record.cure} />
-
+              {record.cure && (
+                <span
+                  className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                    isCured
+                      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                      : "bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20"
+                  }`}
+                >
+                  {record.cure}
+                </span>
+              )}
             </div>
-          </CardContent>
+
+            {/* Right Toggle Button */}
+            <div className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground shrink-0 font-medium bg-background border border-border px-2 py-0.5 rounded-md">
+              <span>{open ? "Hide" : "Details"}</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+            </div>
+          </div>
+
+          {/* Compact 1-line Summary when closed */}
+          {!open && (record.complain || record.treatment) && (
+            <div className="flex items-center gap-3 text-xs text-muted-foreground pt-0.5 truncate">
+              {record.complain && (
+                <span className="truncate">
+                  <strong className="text-foreground font-medium">Complaint:</strong> {record.complain}
+                </span>
+              )}
+              {record.treatment && (
+                <span className="truncate">
+                  <strong className="text-teal-600 dark:text-teal-400 font-medium">Treatment:</strong> {record.treatment}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* 🔹 EXPANDED DETAILS */}
+        {open && (
+          <div className="p-3 sm:p-4 space-y-2.5 bg-background border-t border-border/50">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <ClinicalItem icon={Activity} label="Patient Complaint" value={record.complain} colorClass="text-amber-600 dark:text-amber-400" />
+              <ClinicalItem icon={FileSearch} label="Investigation / Tests" value={record.investigation} colorClass="text-blue-600 dark:text-blue-400" />
+              <ClinicalItem icon={Pill} label="Treatment & Prescription" value={record.treatment} colorClass="text-teal-600 dark:text-teal-400" />
+              <ClinicalItem icon={Lightbulb} label="Doctor Advice" value={record.advice} colorClass="text-indigo-600 dark:text-indigo-400" />
+              <ClinicalItem icon={Activity} label="Improvement" value={record.improvement} colorClass="text-emerald-600 dark:text-emerald-400" />
+              <ClinicalItem icon={CheckCircle2} label="Cure Status" value={record.cure} colorClass="text-emerald-600 dark:text-emerald-400" />
+            </div>
+          </div>
         )}
-      </Card>
+      </div>
     </motion.div>
   );
 }

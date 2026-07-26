@@ -3,8 +3,6 @@ generator client {
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
-
-
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
@@ -16,6 +14,7 @@ model Patient {
   age          Int
   fatherName   String
   mobileNumber String?
+  gender       String?
   address      String
   createdAt    DateTime @default(now())
   userId       String   @db.ObjectId
@@ -23,6 +22,7 @@ model Patient {
 
   records      PatientRecord[]
 }
+
 model PatientRecord {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   patientId     String   @db.ObjectId
