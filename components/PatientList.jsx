@@ -82,7 +82,7 @@ export default function PatientList({ patients = [], activePatientId = null, onS
             placeholder="Search name or phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-background border border-border focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-foreground outline-none transition placeholder:text-muted-foreground font-sans"
+            className="w-full pl-9 pr-8 py-2 rounded-xl text-base sm:text-sm bg-background border border-border focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-foreground outline-none transition placeholder:text-muted-foreground font-sans"
           />
           {search && (
             <button
