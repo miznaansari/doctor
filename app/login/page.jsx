@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Lock, Stethoscope, Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/app/ThemeToggle";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -19,6 +22,7 @@ export default function LoginPage() {
     if (loading) return;
 
     setLoading(true);
+    const toastId = toast.loading("Authenticating...");
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -30,88 +34,125 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Logged in");
+        toast.success("Welcome back, Doctor!", { id: toastId });
         router.push("/");
         router.refresh();
       } else {
-        toast.error(data.error || "Login failed");
+        toast.error(data.error || "Login failed", { id: toastId });
       }
     } catch {
-      toast.error("Network error");
+      toast.error("Network error. Please try again.", { id: toastId });
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 relative font-sans">
+      
+      {/* 🌗 TOP RIGHT THEME TOGGLE */}
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
 
-      <div className="w-full max-w-md bg-card border rounded-2xl shadow-sm p-6 sm:p-8">
+      {/* 💳 MAIN LOGIN CARD */}
+      <div className="w-full max-w-md bg-card border border-border/80 rounded-2xl shadow-lg p-6 sm:p-8 relative overflow-hidden">
+        
+        {/* Subtle Gradient Backdrop Glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-teal-500/10 via-cyan-500/5 to-transparent rounded-full blur-2xl pointer-events-none" />
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
 
-          {/* HEADER */}
-          <div className="space-y-1 text-center">
-            <h1 className="text-2xl font-semibold">Welcome back</h1>
-            <p className="text-sm text-muted-foreground">
-              Login to your account
+          {/* 🩺 BRAND HEADER */}
+          <div className="flex flex-col items-center text-center space-y-2">
+            <div className="w-14 h-14 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 shadow-xs">
+              <Stethoscope className="w-7 h-7" />
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
+              Doctor Workspace
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              Sign in to manage patient records, vitals & prescriptions
             </p>
           </div>
 
-          {/* EMAIL */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              Email
+          {/* ✉️ EMAIL INPUT */}
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Email Address
             </label>
-
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              autoComplete="email"
-              placeholder="Enter your email"
-              className="w-full text-base px-3 py-2 rounded-lg border bg-background outline-none
-              focus:ring-2 focus:ring-primary/30 transition"
-            />
+            <div className="flex items-center rounded-xl border border-border/80 bg-background transition overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20">
+              <div className="pl-3.5 pr-2 text-muted-foreground/70 shrink-0 flex items-center justify-center">
+                <Mail className="w-4 h-4" />
+              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                autoComplete="email"
+                placeholder="doctor@clinic.com"
+                disabled={loading}
+                className="w-full py-2.5 pr-4 text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+              />
+            </div>
           </div>
 
-          {/* PASSWORD */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
+          {/* 🔒 PASSWORD INPUT */}
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Password
             </label>
-
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              autoComplete="current-password"
-              placeholder="Enter your password"
-              className="w-full text-base px-3 py-2 rounded-lg border bg-background outline-none
-              focus:ring-2 focus:ring-primary/30 transition"
-            />
+            <div className="flex items-center rounded-xl border border-border/80 bg-background transition overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20">
+              <div className="pl-3.5 pr-2 text-muted-foreground/70 shrink-0 flex items-center justify-center">
+                <Lock className="w-4 h-4" />
+              </div>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={handleChange}
+                required
+                autoComplete="current-password"
+                placeholder="••••••••"
+                disabled={loading}
+                className="w-full py-2.5 pr-2 text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="pr-3 text-muted-foreground/70 hover:text-foreground transition"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
-          {/* BUTTON */}
+          {/* 🚀 LOGIN BUTTON */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-lg text-base font-medium transition hover:opacity-90 disabled:opacity-50"
+            className="w-full bg-teal-600 hover:bg-teal-700 active:scale-[0.99] text-white py-3 rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2 text-base disabled:opacity-50"
           >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Signing in...</span>
+              </>
+            ) : (
+              <span>Sign In to Workspace →</span>
+            )}
           </button>
 
-          {/* FOOTER */}
-          <p className="text-sm text-center text-muted-foreground">
-            Don’t have an account?{" "}
-            <a href="/signup" className="text-primary font-medium hover:underline">
-              Sign up
-            </a>
+          {/* 🔗 SIGNUP FOOTER */}
+          <p className="text-xs text-center text-muted-foreground pt-2">
+            Don’t have a doctor account?{" "}
+            <Link href="/signup" className="text-teal-600 dark:text-teal-400 font-bold hover:underline">
+              Create an account
+            </Link>
           </p>
 
         </form>
