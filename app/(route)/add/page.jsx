@@ -16,7 +16,7 @@ export default function AddPatientPage() {
   return (
     <div className="flex-1 flex flex-col h-full overflow-y-auto bg-background font-sans">
       {/* 🩺 STICKY MEDICAL HEADER */}
-      <div className="sticky top-0 z-20 h-14 bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-900 dark:from-slate-950 dark:via-slate-900 dark:to-teal-950 text-white shadow-md border-b border-white/10 flex items-center">
+      <div className="shrink-0 sticky top-0 z-20 h-14 bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-900 dark:from-slate-950 dark:via-slate-900 dark:to-teal-950 text-white shadow-md border-b border-white/10 flex items-center">
         <div className="w-full flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <button

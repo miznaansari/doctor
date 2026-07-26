@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { withRequireUser } from "@/lib/withRequireUser";
 
-
 export const GET = withRequireUser(async function GET(req) {
   const user = req.user;
   const patients = await prisma.patient.findMany({
@@ -28,6 +27,7 @@ export const POST = withRequireUser(async function POST(req) {
       data: {
         patientName: body.patientName,
         age: Number(body.age),
+        gender: body.gender || "Male",
         fatherName: body.fatherName,
         mobileNumber: body.mobileNumber,
         address: body.address,
