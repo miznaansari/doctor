@@ -35,7 +35,7 @@ export default function PatientList({ patients = [], activePatientId = null, onS
     <div className="w-full h-full flex flex-col bg-card border-r border-border/60 shadow-sm overflow-hidden select-none font-sans relative">
       
       {/* 🩺 MEDICAL HEADER */}
-      <div className="shrink-0 bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-900 dark:from-slate-950 dark:via-slate-900 dark:to-teal-950 text-white px-4 py-3.5 shadow-md flex items-center justify-between border-b border-white/10">
+      <div className="shrink-0 h-14 bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-900 dark:from-slate-950 dark:via-slate-900 dark:to-teal-950 text-white px-4 shadow-md flex items-center justify-between border-b border-white/10">
         <div className="flex items-center gap-3">
           {/* 3-LINE MENU HAMBURGER BUTTON */}
           <button

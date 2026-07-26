@@ -62,11 +62,11 @@ export default function PatientDetail({ patient, records = [], loading = false, 
   const cleanMobile = mobile ? mobile.replace(/\D/g, "") : "";
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background font-sans">
+    <div className="flex-1 flex flex-col h-full overflow-hidden overflow-x-hidden bg-background font-sans">
       
       {/* 📱 STICKY MOBILE TOP NAVIGATION BAR */}
       {showMobileBack && (
-        <div className="shrink-0 md:hidden bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-900 dark:from-slate-950 dark:via-slate-900 dark:to-teal-950 text-white border-b border-white/10 px-3 py-2.5 flex items-center justify-between sticky top-0 z-20 shadow-md">
+        <div className="shrink-0 md:hidden h-14 bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-900 dark:from-slate-950 dark:via-slate-900 dark:to-teal-950 text-white border-b border-white/10 px-3 flex items-center justify-between sticky top-0 z-20 shadow-md">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <Link
               href="/"
@@ -119,8 +119,8 @@ export default function PatientDetail({ patient, records = [], loading = false, 
         </div>
       )}
 
-      {/* 📜 SCROLLABLE CONTENT AREA */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin scroll-smooth">
+      {/* 📜 SCROLLABLE CONTENT AREA (Pure Vertical Y-Axis Scroll, Strictly No X-Scroll) */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 space-y-6 scrollbar-thin scroll-smooth">
         
         {/* PATIENT INFO HEADER CARD */}
         <PatientHeader
@@ -161,10 +161,10 @@ export default function PatientDetail({ patient, records = [], loading = false, 
                 {records.map((record, index) => (
                   <motion.div
                     key={record.id}
-                    initial={{ opacity: 0, y: -15, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -15, scale: 0.98 }}
-                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    initial={{ opacity: 0, y: -12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.28, ease: "easeOut" }}
                   >
                     <RecordCard record={record} defaultOpen={index === 0} />
                   </motion.div>

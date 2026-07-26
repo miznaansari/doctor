@@ -26,7 +26,7 @@ function Input({ label, type = "text", icon, value, onChange, error, loading }) 
           value={value || ""}
           disabled={loading}
           onChange={onChange}
-          className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition
+          className={`w-full rounded-lg border bg-background px-3 py-2 text-base sm:text-sm outline-none transition
             ${icon ? "pl-9" : ""}
             ${
               error
@@ -57,7 +57,7 @@ function TextArea({ label, value, onChange, error, loading }) {
         value={value || ""}
         disabled={loading}
         onChange={onChange}
-        className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none resize-none transition
+        className={`w-full rounded-lg border bg-background px-3 py-2 text-base sm:text-sm outline-none resize-none transition
           ${
             error
               ? "border-red-500"

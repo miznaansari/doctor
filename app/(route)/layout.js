@@ -39,13 +39,13 @@ export default function WorkspaceLayout({ children }) {
   }, [pathname]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background font-sans">
+    <div className="flex h-screen w-screen overflow-hidden overflow-x-hidden bg-background font-sans">
       {/* 📱 / 💻 PERSISTENT PATIENT LIST SIDEBAR
           - On Mobile (< md): Visible ONLY on home route /
           - On Desktop (>= md): Always visible on left sidebar!
       */}
       <div
-        className={`w-full md:w-80 lg:w-96 shrink-0 h-full ${
+        className={`w-full md:w-80 lg:w-96 shrink-0 h-full overflow-x-hidden ${
           isDetailViewOnMobile ? "hidden md:block" : "block"
         }`}
       >
@@ -64,7 +64,7 @@ export default function WorkspaceLayout({ children }) {
           - On Desktop (>= md): Always visible on right side!
       */}
       <main
-        className={`flex-1 flex flex-col h-full min-w-0 overflow-hidden border-l border-border/40 ${
+        className={`flex-1 flex flex-col h-full min-w-0 overflow-hidden overflow-x-hidden border-l border-border/40 ${
           !isDetailViewOnMobile ? "hidden md:flex" : "flex"
         }`}
       >

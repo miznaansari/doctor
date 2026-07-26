@@ -121,7 +121,7 @@ export default function AddPatientForm({ refreshPatients }) {
               onChange={(e) => update("patientName", e.target.value)}
               placeholder="e.g. Mizna Ansari"
               disabled={loading}
-              className="w-full py-2.5 pr-4 text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+              className="w-full py-2.5 pr-4 text-base sm:text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
             />
           </div>
           {errors.patientName && (
@@ -153,7 +153,7 @@ export default function AddPatientForm({ refreshPatients }) {
                 disabled={loading}
                 min="0"
                 max="120"
-                className="w-full py-2.5 pr-4 text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+                className="w-full py-2.5 pr-4 text-base sm:text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
               />
             </div>
             {errors.age && (
@@ -171,7 +171,7 @@ export default function AddPatientForm({ refreshPatients }) {
                 value={form.gender}
                 onChange={(e) => update("gender", e.target.value)}
                 disabled={loading}
-                className="w-full px-3.5 py-2.5 text-sm bg-transparent border-0 outline-none text-foreground cursor-pointer font-sans"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm bg-transparent border-0 outline-none text-foreground cursor-pointer font-sans"
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -199,7 +199,7 @@ export default function AddPatientForm({ refreshPatients }) {
                 onChange={(e) => update("fatherName", e.target.value)}
                 placeholder="Father / Husband name"
                 disabled={loading}
-                className="w-full py-2.5 pr-4 text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+                className="w-full py-2.5 pr-4 text-base sm:text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
               />
             </div>
             {errors.fatherName && (
@@ -229,7 +229,7 @@ export default function AddPatientForm({ refreshPatients }) {
               disabled={loading}
               pattern="\d{10,15}"
               maxLength={15}
-              className="w-full py-2.5 pr-4 text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+              className="w-full py-2.5 pr-4 text-base sm:text-sm bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/60 font-sans"
             />
           </div>
           {errors.mobileNumber && (
@@ -256,7 +256,7 @@ export default function AddPatientForm({ refreshPatients }) {
               onChange={(e) => update("address", e.target.value)}
               placeholder="Enter full residential address..."
               disabled={loading}
-              className="w-full py-2.5 pr-4 text-sm bg-transparent border-0 outline-none resize-none text-foreground placeholder:text-muted-foreground/60 font-sans"
+              className="w-full py-2.5 pr-4 text-base sm:text-sm bg-transparent border-0 outline-none resize-none text-foreground placeholder:text-muted-foreground/60 font-sans"
             />
           </div>
           {errors.address && (
