@@ -143,8 +143,8 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
               {patient.patientName}
             </h1>
 
-            {/* Gender, Age & Guardian strictly on the SAME line */}
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium truncate mt-0.5">
+            {/* Gender, Age & Guardian on the same line without truncation */}
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground font-medium mt-0.5">
               {patient.gender && (
                 <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-md bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 shrink-0">
                   {patient.gender}
@@ -159,9 +159,9 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
               )}
 
               {patient.fatherName && (
-                <span className="truncate text-muted-foreground flex items-center gap-1.5">
+                <span className="text-muted-foreground flex items-center gap-1.5">
                   {(patient.gender || patient.age) && <span className="text-muted-foreground/40">•</span>}
-                  <span className="truncate">Guardian: <strong className="font-semibold text-foreground">{patient.fatherName}</strong></span>
+                  <span>Guardian: <strong className="font-semibold text-foreground">{patient.fatherName}</strong></span>
                 </span>
               )}
             </div>
