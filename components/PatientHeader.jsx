@@ -139,33 +139,29 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
 
           {/* Name, Gender, Age & Guardian */}
           <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="font-extrabold text-base sm:text-lg text-foreground tracking-tight truncate">
-                {patient.patientName}
-              </h1>
+            <h1 className="font-extrabold text-base sm:text-lg text-foreground tracking-tight truncate">
+              {patient.patientName}
+            </h1>
 
+            {/* Gender, Age & Guardian strictly on the SAME line */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium truncate mt-0.5">
               {patient.gender && (
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 shrink-0">
+                <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-md bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 shrink-0">
                   {patient.gender}
                 </span>
               )}
-            </div>
 
-            {/* Age & Guardian on the same line with clear spacing */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium flex-wrap mt-0.5">
               {patient.age && (
-                <span className="font-semibold text-foreground/90 shrink-0">
-                  {patient.age} yrs
+                <span className="text-muted-foreground font-medium shrink-0 flex items-center gap-1.5">
+                  {patient.gender && <span className="text-muted-foreground/40">•</span>}
+                  <span><strong className="font-semibold text-foreground">{patient.age}</strong> yrs</span>
                 </span>
               )}
 
-              {patient.age && patient.fatherName && (
-                <span className="text-muted-foreground/40">•</span>
-              )}
-
               {patient.fatherName && (
-                <span className="truncate">
-                  Guardian: <span className="text-foreground font-semibold">{patient.fatherName}</span>
+                <span className="truncate text-muted-foreground flex items-center gap-1.5">
+                  {(patient.gender || patient.age) && <span className="text-muted-foreground/40">•</span>}
+                  <span className="truncate">Guardian: <strong className="font-semibold text-foreground">{patient.fatherName}</strong></span>
                 </span>
               )}
             </div>
@@ -232,7 +228,7 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
           </Button>
         )}
 
-        {/* Action Group: Call, WhatsApp, Edit, Delete */}
+        {/* Action Group: Call, WhatsApp, Delete, Edit */}
         <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-end">
           {mobile && (
             <>
@@ -261,21 +257,21 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
           )}
 
           <button
-            onClick={handleOpenEdit}
-            className="h-9 px-3 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold flex items-center gap-1.5 border border-border/70 transition active:scale-95 flex-1 sm:flex-initial justify-center"
-            title="Edit Patient"
-          >
-            <Pencil className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-            <span>Edit</span>
-          </button>
-
-          <button
             onClick={() => setDeleteOpen(true)}
             className="h-9 px-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1.5 border border-red-500/30 transition active:scale-95 flex-1 sm:flex-initial justify-center"
             title="Delete Patient"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Delete</span>
+          </button>
+
+          <button
+            onClick={handleOpenEdit}
+            className="h-9 px-3 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold flex items-center gap-1.5 border border-border/70 transition active:scale-95 flex-1 sm:flex-initial justify-center"
+            title="Edit Patient"
+          >
+            <Pencil className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+            <span>Edit</span>
           </button>
         </div>
       </div>
