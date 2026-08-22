@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MapPin, User, Calendar, Phone, PhoneOff, Stethoscope, Clock, Pencil, X, Loader2 } from "lucide-react";
+import { MapPin, User, Calendar, Phone, PhoneOff, Stethoscope, Clock, Pencil, Trash2, AlertTriangle, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,8 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [form, setForm] = useState({
     patientName: patient?.patientName || "",
@@ -94,6 +96,36 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
     }
   };
 
+  const handleDeletePatient = async () => {
+    if (deleting) return;
+
+    try {
+      setDeleting(true);
+      const res = await fetch(`/api/patient/${patient.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        toast.error("Failed to delete patient");
+        setDeleting(false);
+        return;
+      }
+
+      toast.success("Patient deleted successfully");
+      setDeleteOpen(false);
+      if (onRefresh) {
+        onRefresh();
+      }
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error while deleting patient");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="w-full bg-card border border-border/80 rounded-xl p-3 sm:p-3.5 shadow-xs font-sans space-y-2">
 
@@ -124,7 +156,7 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
           )}
         </div>
 
-        {/* Right: Action Buttons (Edit, Call, WhatsApp, + Record) */}
+        {/* Right: Action Buttons (Edit, Delete, Call, WhatsApp, + Record) */}
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={handleOpenEdit}
@@ -133,6 +165,15 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
           >
             <Pencil className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
             <span>Edit</span>
+          </button>
+
+          <button
+            onClick={() => setDeleteOpen(true)}
+            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1 border border-red-500/20 transition active:scale-95"
+            title="Delete Patient"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete</span>
           </button>
 
           {mobile ? (
@@ -308,6 +349,55 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 🗑️ DELETE CONFIRMATION MODAL DIALOG */}
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => !deleting && setDeleteOpen(false)}
+          />
+
+          <div className="relative z-50 w-full max-w-md bg-card border border-border rounded-xl shadow-xl p-5 sm:p-6 space-y-4 font-sans animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="p-2.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 shrink-0">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1.5">
+                <h2 className="text-base sm:text-lg font-bold text-foreground">
+                  Delete Patient Record?
+                </h2>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Are you sure you want to delete <span className="font-semibold text-foreground">{patient.patientName}</span>? This patient will be removed from your active workspace.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={deleting}
+                onClick={() => setDeleteOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={deleting}
+                onClick={handleDeletePatient}
+                className="font-bold flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white"
+              >
+                {deleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {deleting ? "Deleting..." : "Delete Patient"}
+              </Button>
+            </div>
           </div>
         </div>
       )}

@@ -7,7 +7,7 @@ export const GET = withRequireUser(async function GET(req, { params }) {
     where: { id: p.id },
   });
 
-  if (!patient || patient.userId !== req.user.id) {
+  if (!patient || patient.userId !== req.user.id || patient.isDeleted) {
     return Response.json({ error: "Patient not found" }, { status: 404 });
   }
 
@@ -23,7 +23,7 @@ export const PUT = withRequireUser(async function PUT(req, { params }) {
       where: { id: p.id },
     });
 
-    if (!existing || existing.userId !== req.user.id) {
+    if (!existing || existing.userId !== req.user.id || existing.isDeleted) {
       return Response.json({ error: "Patient not found" }, { status: 404 });
     }
 
@@ -56,5 +56,44 @@ export const PUT = withRequireUser(async function PUT(req, { params }) {
   } catch (err) {
     console.error("Failed to update patient:", err);
     return Response.json({ error: "Failed to update patient" }, { status: 500 });
+  }
+});
+
+export const DELETE = withRequireUser(async function DELETE(req, { params }) {
+  try {
+    const p = await params;
+    const existing = await prisma.patient.findUnique({
+      where: { id: p.id },
+    });
+
+    if (!existing || existing.userId !== req.user.id || existing.isDeleted) {
+      return Response.json({ error: "Patient not found" }, { status: 404 });
+    }
+
+    try {
+      await prisma.patient.update({
+        where: { id: p.id },
+        data: {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+      });
+    } catch {
+      // Fallback direct MongoDB update if Prisma client is pending regeneration
+      await prisma.$runCommandRaw({
+        update: "Patient",
+        updates: [
+          {
+            q: { _id: { $oid: p.id } },
+            u: { $set: { isDeleted: true, deletedAt: new Date().toISOString() } },
+          },
+        ],
+      });
+    }
+
+    return Response.json({ success: true, message: "Patient deleted successfully" });
+  } catch (err) {
+    console.error("Failed to delete patient:", err);
+    return Response.json({ error: "Failed to delete patient" }, { status: 500 });
   }
 });

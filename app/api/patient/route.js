@@ -3,11 +3,27 @@ import { withRequireUser } from "@/lib/withRequireUser";
 
 export const GET = withRequireUser(async function GET(req) {
   const user = req.user;
-  const patients = await prisma.patient.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-  });
-  return Response.json(patients);
+  try {
+    const patients = await prisma.patient.findMany({
+      where: {
+        userId: user.id,
+        OR: [
+          { isDeleted: false },
+          { isDeleted: null },
+        ],
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return Response.json(patients);
+  } catch {
+    // Graceful fallback if Prisma Client runtime is pending regeneration
+    const patients = await prisma.patient.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+    });
+    const activePatients = patients.filter((p) => !p.isDeleted);
+    return Response.json(activePatients);
+  }
 });
 
 export const POST = withRequireUser(async function POST(req) {
