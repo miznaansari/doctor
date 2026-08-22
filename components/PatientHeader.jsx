@@ -127,40 +127,142 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
   };
 
   return (
-    <div className="w-full bg-card border border-border/80 rounded-xl p-3 sm:p-3.5 shadow-xs font-sans space-y-2">
+    <div className="w-full bg-card border border-border/80 rounded-2xl p-4 sm:p-5 shadow-xs font-sans space-y-3.5">
 
-      {/* 🔹 ROW 1: Name, Gender, Age, Guardian & Action Buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {/* Left: Patient Main Vitals */}
-        <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <h1 className="font-extrabold text-base sm:text-lg text-foreground tracking-tight truncate">
-            {patient.patientName}
-          </h1>
+      {/* 🔹 TOP ROW: Patient Avatar, Identity & Total Visits */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Avatar Initial Circle */}
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-700 text-white font-extrabold text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs select-none">
+            {patient.patientName?.charAt(0)?.toUpperCase() || "P"}
+          </div>
 
-          {patient.gender && (
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
-              {patient.gender}
-            </span>
-          )}
+          {/* Name, Gender, Age & Guardian */}
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="font-extrabold text-base sm:text-lg text-foreground tracking-tight truncate">
+                {patient.patientName}
+              </h1>
 
-          {patient.age && (
-            <span className="text-xs text-muted-foreground font-medium">
-              • {patient.age} yrs
-            </span>
-          )}
+              {patient.gender && (
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 shrink-0">
+                  {patient.gender}
+                </span>
+              )}
+            </div>
 
-          {patient.fatherName && (
-            <span className="text-xs text-muted-foreground font-medium truncate max-w-[150px]">
-              • Guardian: {patient.fatherName}
-            </span>
+            {/* Age & Guardian on the same line with clear spacing */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium flex-wrap mt-0.5">
+              {patient.age && (
+                <span className="font-semibold text-foreground/90 shrink-0">
+                  {patient.age} yrs
+                </span>
+              )}
+
+              {patient.age && patient.fatherName && (
+                <span className="text-muted-foreground/40">•</span>
+              )}
+
+              {patient.fatherName && (
+                <span className="truncate">
+                  Guardian: <span className="text-foreground font-semibold">{patient.fatherName}</span>
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Total Visits Pill */}
+        <span className="flex items-center gap-1.5 font-bold text-teal-700 dark:text-teal-300 text-xs bg-teal-500/10 px-2.5 py-1 rounded-xl border border-teal-500/20 shrink-0">
+          <Stethoscope className="w-3.5 h-3.5" />
+          <span>{totalRecords} {totalRecords === 1 ? "Visit" : "Visits"}</span>
+        </span>
+      </div>
+
+      {/* 🔹 MIDDLE ROW: Mobile No & Reg Date (Justify Between) + Address */}
+      <div className="text-xs text-muted-foreground bg-muted/40 p-2.5 sm:p-3 rounded-xl border border-border/40 space-y-2">
+        {/* Phone No (Left) & Reg Date (Right) */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+              <Phone className="w-3.5 h-3.5" />
+            </div>
+            {mobile ? (
+              <a href={`tel:${mobile}`} className="font-semibold text-foreground hover:text-teal-600 hover:underline truncate">
+                {mobile}
+              </a>
+            ) : (
+              <span className="italic text-muted-foreground/70">No mobile</span>
+            )}
+          </div>
+
+          {formattedDate && (
+            <div className="flex items-center gap-1.5 shrink-0 text-muted-foreground">
+              <Clock className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+              <span className="font-medium">Reg: {formattedDate}</span>
+            </div>
           )}
         </div>
 
-        {/* Right: Action Buttons (Edit, Delete, Call, WhatsApp, + Record) */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        {/* Address */}
+        {patient.address && (
+          <div className="flex items-center gap-2 pt-1.5 border-t border-border/30 min-w-0">
+            <div className="w-6 h-6 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+              <MapPin className="w-3.5 h-3.5" />
+            </div>
+            <span className="truncate text-muted-foreground font-medium" title={patient.address}>
+              {patient.address}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* 🔹 BOTTOM ROW: CLEAN RESPONSIVE ACTION BUTTONS TOOLBAR */}
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/40">
+        
+        {/* Primary CTA: + Record */}
+        {onAddRecordClick && (
+          <Button
+            onClick={onAddRecordClick}
+            size="sm"
+            className="h-9 px-3.5 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition w-full sm:w-auto justify-center"
+          >
+            <Stethoscope className="w-4 h-4" />
+            <span>+ Add Record</span>
+          </Button>
+        )}
+
+        {/* Action Group: Call, WhatsApp, Edit, Delete */}
+        <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-end">
+          {mobile && (
+            <>
+              <a
+                href={`tel:${mobile}`}
+                className="h-9 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 border border-emerald-500/30 transition active:scale-95 flex-1 sm:flex-initial justify-center"
+                title="Call Patient"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>Call</span>
+              </a>
+
+              {cleanMobile && (
+                <a
+                  href={`https://wa.me/${cleanMobile}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-9 px-3 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-xs flex-1 sm:flex-initial justify-center"
+                  title="WhatsApp"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+                  <span>WhatsApp</span>
+                </a>
+              )}
+            </>
+          )}
+
           <button
             onClick={handleOpenEdit}
-            className="p-1.5 rounded-lg bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold flex items-center gap-1 border border-border/60 transition active:scale-95"
+            className="h-9 px-3 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold flex items-center gap-1.5 border border-border/70 transition active:scale-95 flex-1 sm:flex-initial justify-center"
             title="Edit Patient"
           >
             <Pencil className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
@@ -169,86 +271,13 @@ export default function PatientHeader({ patient, totalRecords = 0, onAddRecordCl
 
           <button
             onClick={() => setDeleteOpen(true)}
-            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1 border border-red-500/20 transition active:scale-95"
+            className="h-9 px-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1.5 border border-red-500/30 transition active:scale-95 flex-1 sm:flex-initial justify-center"
             title="Delete Patient"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Delete</span>
           </button>
-
-          {mobile ? (
-            <>
-              <a
-                href={`tel:${mobile}`}
-                className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 text-xs font-semibold flex items-center gap-1 border border-emerald-500/30 transition active:scale-95"
-                title="Call"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Call</span>
-              </a>
-
-              {cleanMobile && (
-                <a
-                  href={`https://wa.me/${cleanMobile}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-semibold flex items-center gap-1 transition active:scale-95 shadow-xs"
-                  title="WhatsApp"
-                >
-                  <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
-                  <span className="hidden sm:inline">WhatsApp</span>
-                </a>
-              )}
-            </>
-          ) : (
-            <span className="text-[11px] text-muted-foreground/70 italic px-2 py-1 bg-muted rounded-md">
-              No Mobile
-            </span>
-          )}
-
-          {onAddRecordClick && (
-            <Button
-              onClick={onAddRecordClick}
-              size="sm"
-              className="h-7 px-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-xs"
-            >
-              <Stethoscope className="w-3.5 h-3.5" />
-              <span>+ Record</span>
-            </Button>
-          )}
         </div>
-      </div>
-
-      {/* 🔹 ROW 2: Mobile Number, Address, Reg Date & Visit Count */}
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground pt-1.5 border-t border-border/40">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 min-w-0">
-          {mobile && (
-            <span className="flex items-center gap-1 font-semibold text-foreground">
-              <Phone className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" />
-              <span>{mobile}</span>
-            </span>
-          )}
-
-          {patient.address && (
-            <span className="flex items-center gap-1 font-medium text-muted-foreground truncate max-w-[200px] sm:max-w-[300px]">
-              <MapPin className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" />
-              <span className="truncate">{patient.address}</span>
-            </span>
-          )}
-
-          {formattedDate && (
-            <span className="flex items-center gap-1 text-muted-foreground/80">
-              <Clock className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" />
-              <span>Reg: {formattedDate}</span>
-            </span>
-          )}
-        </div>
-
-        {/* Visits Count Pill */}
-        <span className="flex items-center gap-1 font-bold text-teal-700 dark:text-teal-300 text-xs bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20 shrink-0">
-          <Stethoscope className="w-3 h-3" />
-          {totalRecords} {totalRecords === 1 ? "Visit" : "Visits"}
-        </span>
       </div>
 
       {/* ✏️ EDIT PATIENT MODAL DIALOG */}
